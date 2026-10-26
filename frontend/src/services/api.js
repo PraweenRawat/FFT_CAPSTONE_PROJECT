@@ -3,7 +3,26 @@
  * Centralizes all communication between frontend and backend.
  */
 
-const API_BASE = 'http://localhost:5000/api';
+const getApiBase = () => {
+  // 1. Explicit environment variable (configured in Vercel / Netlify / Render)
+  if (import.meta.env.VITE_API_URL) {
+    const raw = import.meta.env.VITE_API_URL.trim();
+    return raw.endsWith('/api') ? raw : `${raw.replace(/\/+$/, '')}/api`;
+  }
+  // 2. If running locally in Vite dev mode (ports 5173, 3000)
+  if (typeof window !== 'undefined') {
+    const host = window.location.hostname;
+    const port = window.location.port;
+    if ((host === 'localhost' || host === '127.0.0.1') && port !== '5000') {
+      return 'http://localhost:5000/api';
+    }
+    // 3. In production or same-host single deployment, use relative /api
+    return '/api';
+  }
+  return 'http://localhost:5000/api';
+};
+
+export const API_BASE = getApiBase();
 
 export const getAuthToken = () => {
   try {

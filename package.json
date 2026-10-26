@@ -1,0 +1,11 @@
+{
+  "name": "fft-capstone-project",
+  "version": "1.0.0",
+  "description": "StockLink B2B Wholesale Commerce Platform",
+  "private": true,
+  "scripts": {
+    "build": "npm --prefix frontend install && npm --prefix frontend run build && npm --prefix backend install",
+    "start": "node backend/server.js",
+    "test": "npm --prefix backend test"
+  }
+}

@@ -2,19 +2,28 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
+import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
 import authRoutes from './routes/authRoutes.js';
 import dashboardRoutes from './routes/dashboardRoutes.js';
 
 dotenv.config();
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/stocklink';
 
-// CORS configuration
+// CORS configuration - supports Vercel, Netlify, Render, and local dev
 app.use(
   cors({
-    origin: ['http://localhost:5173', 'http://127.0.0.1:5173', 'http://localhost:3000'],
+    origin: (origin, callback) => {
+      // Permissive CORS for academic/capstone demo so deployed frontend is never blocked
+      callback(null, true);
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
@@ -23,7 +32,7 @@ app.use(
 
 app.use(express.json());
 
-// Request logging middleware in development
+// Request logging middleware
 app.use((req, res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
   next();
@@ -39,17 +48,38 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Authentication routes
+// API Routes
 app.use('/api/auth', authRoutes);
-
-// Dashboard & Catalogue routes
 app.use('/api/dashboard', dashboardRoutes);
 
-// 404 Handler
-app.use((req, res) => {
+// Optional: Serve Frontend statically if deployed as a single full-stack service
+const distPath = path.resolve(__dirname, '../frontend/dist');
+if (fs.existsSync(distPath)) {
+  console.log(`Serving static frontend build from: ${distPath}`);
+  app.use(express.static(distPath));
+
+  // Handle SPA client-side routing fallback for non-API requests
+  app.get('*', (req, res, next) => {
+    if (req.url.startsWith('/api')) {
+      return next();
+    }
+    res.sendFile(path.join(distPath, 'index.html'));
+  });
+}
+
+// 404 Handler for API
+app.use('/api', (req, res) => {
   res.status(404).json({
     success: false,
     message: `API endpoint not found: ${req.method} ${req.originalUrl}`
+  });
+});
+
+// Wildcard 404 when frontend is not bundled locally
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: `Endpoint not found: ${req.method} ${req.originalUrl}`
   });
 });
 

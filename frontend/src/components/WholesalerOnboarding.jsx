@@ -18,6 +18,7 @@ import {
   Layers,
 } from 'lucide-react';
 import stocklinkLogo from '../assets/stocklink-logo.png';
+import { API_BASE } from '../services/api';
 import '../styles/Onboarding.css';
 
 const GSTIN_REGEX = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
@@ -148,7 +149,7 @@ export default function WholesalerOnboarding() {
 
     try {
       const token = localStorage.getItem('stocklink_token');
-      const res = await fetch('http://localhost:5000/api/auth/onboard/wholesaler', {
+      const res = await fetch(`${API_BASE}/auth/onboard/wholesaler`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

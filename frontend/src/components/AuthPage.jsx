@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import stocklinkLogo from '../assets/stocklink-logo.png';
 import { roleShowcaseData, demoCredentials } from '../data/authData';
+import { API_BASE } from '../services/api';
 import '../styles/AuthPage.css';
 
 export default function AuthPage({ initialMode = 'login', initialRole = 'retailer', onNavigate }) {
@@ -217,7 +218,7 @@ export default function AuthPage({ initialMode = 'login', initialRole = 'retaile
 
     try {
       if (authMode === 'login') {
-        const response = await fetch('http://localhost:5000/api/auth/login', {
+        const response = await fetch(`${API_BASE}/auth/login`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -252,7 +253,7 @@ export default function AuthPage({ initialMode = 'login', initialRole = 'retaile
         }, 500);
       } else {
         // Sign Up Mode
-        const response = await fetch('http://localhost:5000/api/auth/login', {
+        const response = await fetch(`${API_BASE}/auth/login`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
