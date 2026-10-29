@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StockLink — Capstone Project Presentation</title>
+  <style>
+    :root {
+      --bg: #1A1622;
+      --card-bg: #262030;
+      --border: #413750;
+      --ochre: #FFA062;
+      --ochre-deep: #E0834A;
+      --green: #22C55E;
+      --blue: #3B82F6;
+      --text: #FFFFFF;
+      --muted: #B9AFCD;
+      --light: #E1DAEB;
+      --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #0f0d14;
+      font-family: var(--font);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow: hidden;
+      user-select: none;
+    }
+    .deck-container {
+      width: 100vw;
+      max-width: 1200px;
+      aspect-ratio: 16 / 9;
+      background: var(--bg);
+      border-radius: 12px;
+      box-shadow: 0 16px 50px rgba(0,0,0,0.6);
+      border: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      padding: 2.2rem 3rem;
+    }
+    .slide {
+      display: none;
+      width: 100%;
+      height: 100%;
+      flex-direction: column;
+      animation: fadeIn 0.25s ease-in-out;
+    }
+    .slide.active { display: flex; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* Top tag & Title */
+    .slide-tag {
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      color: var(--ochre);
+      text-transform: uppercase;
+      margin-bottom: 0.25rem;
+    }
+    .slide-title {
+      font-size: 1.65rem;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 1.25rem;
+      letter-spacing: -0.01em;
+    }
+
+    /* Grids & Cards */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      flex: 1;
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+      flex: 1;
+    }
+    .card {
+      background: var(--card-bg);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem 1.4rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+    }
+    .card-title {
+      font-size: 0.85rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding-bottom: 0.4rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .card-title.ochre { color: var(--ochre); }
+    .card-title.green { color: var(--green); }
+    .card-title.blue  { color: var(--blue); }
+
+    /* Lists */
+    .item-group { display: flex; flex-direction: column; gap: 0.55rem; }
+    .item { display: flex; flex-direction: column; gap: 0.15rem; }
+    .item-head {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .item-sub {
+      font-size: 0.75rem;
+      color: var(--muted);
+      line-height: 1.35;
+      padding-left: 1rem;
+    }
+
+    /* Controls Bar */
+    .controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100vw;
+      max-width: 1200px;
+      margin-top: 1rem;
+      padding: 0 0.5rem;
+    }
+    .btn-group { display: flex; gap: 0.6rem; align-items: center; }
+    .btn {
+      background: #262030;
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 0.5rem 1.1rem;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn:hover { background: var(--ochre-deep); border-color: var(--ochre); }
+    .badge {
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: var(--ochre);
+      background: rgba(255,160,98,0.12);
+      padding: 0.35rem 0.8rem;
+      border-radius: 20px;
+    }
+
+    /* Print styles for direct PDF export */
+    @media print {
+      body { background: #fff; color: #000; overflow: visible; }
+      .controls { display: none; }
+      .deck-container {
+        width: 100%;
+        max-width: none;
+        aspect-ratio: auto;
+        border: none;
+        box-shadow: none;
+        border-radius: 0;
+        padding: 0;
+      }
+      .slide {
+        display: flex !important;
+        page-break-after: always;
+        height: 100vh;
+        padding: 2rem;
+        background: #1A1622;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="deck-container" id="deck">
+
+    <!-- ── SLIDE 1: Title, Team & Agenda ── -->
+    <div class="slide active" id="slide-1">
+      <div style="margin-bottom: 1.5rem;">
+        <div style="width: 48px; height: 4px; background: var(--ochre); border-radius: 2px; margin-bottom: 0.75rem;"></div>
+        <h1 style="font-size: 2.5rem; font-weight: 800; color: #fff; letter-spacing: -0.02em;">StockLink</h1>
+        <p style="font-size: 1.1rem; font-weight: 700; color: var(--ochre); margin-top: 0.2rem;">
+          B2B Wholesale Marketplace & Real-Time Price Discovery Platform
+        </p>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title ochre">Project Team (4 Members)</div>
+          <div class="item-group">
+            <div class="item">
+              <div class="item-head">• Praween Singh Rawat <span style="font-size: 0.7rem; color: var(--ochre);">(Frontend Lead)</span></div>
+              <div class="item-sub">UI/UX Architecture, Brand Design System, Dashboards & Profile Modules</div>
+            </div>
+            <div class="item">
+              <div class="item-head">• Anvitha S <span style="font-size: 0.7rem; color: var(--ochre);">(Frontend Developer)</span></div>
+              <div class="item-sub">Authentication Workflows, 3-Stage Onboarding Wizards, Form Validation & State</div>
+            </div>
+            <div class="item">
+              <div class="item-head">• Tanishq Mittal <span style="font-size: 0.7rem; color: var(--blue);">(Backend Lead)</span></div>
+              <div class="item-sub">Express REST APIs, Role-Based Access Control (RBAC), Middleware & Data Models</div>
+            </div>
+            <div class="item">
+              <div class="item-head">• Ashraj Singh Rana <span style="font-size: 0.7rem; color: var(--green);">(Backend & DevOps)</span></div>
+              <div class="item-sub">Dashboard Aggregation Engines, APMC Benchmark Pricing, Cloud CI/CD Deployment</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title ochre">10-Minute Presentation Agenda</div>
+          <div class="item-group">
+            <div class="item">
+              <div class="item-head">[01] Project Overview & Problem Statement</div>
+              <div class="item-sub">2 Mins · Speaker: Praween Singh Rawat</div>
+            </div>
+            <div class="item">
+              <div class="item-head">[02] Technology Stack & Member Responsibilities</div>
+              <div class="item-sub">2 Mins · Speakers: Anvitha S & Tanishq Mittal</div>
+            </div>
+            <div class="item">
+              <div class="item-head">[03] System Architecture & Live Platform Workflows</div>
+              <div class="item-sub">2 Mins · Speakers: Praween Singh Rawat & Ashraj Singh Rana</div>
+            </div>
+            <div class="item">
+              <div class="item-head">[04] Project Advantages, Limitations & Roadmap</div>
+              <div class="item-sub">2 Mins · Speakers: Tanishq Mittal & Anvitha S</div>
+            </div>
+            <div class="item">
+              <div class="item-head">[05] Live Cloud Hosting & Key Learning Takeaways</div>
+              <div class="item-sub">2 Mins · Speakers: Ashraj Singh Rana & Praween Singh Rawat</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SLIDE 2: Technologies & Responsibilities ── -->
+    <div class="slide" id="slide-2">
+      <div class="slide-tag">STOCKLINK CAPSTONE PRESENTATION</div>
+      <div class="slide-title">Technologies Used & Member Responsibilities</div>
+
+      <div style="display: grid; grid-template-columns: 1.1fr 2fr; gap: 1.5rem; flex: 1;">
+        <div class="card">
+          <div class="card-title ochre">Technology Stack</div>
+          <div class="item-group">
+            <div class="item">
+              <div class="item-head">⚡ Frontend Stack</div>
+              <div class="item-sub">React 18, Vite, React Router v7, Tailwind Design Tokens, Lucide Icons</div>
+            </div>
+            <div class="item">
+              <div class="item-head">⚡ Backend Stack</div>
+              <div class="item-sub">Node.js, Express.js REST Framework, Centralized Middleware Architecture</div>
+            </div>
+            <div class="item">
+              <div class="item-head">⚡ Persistence Engine</div>
+              <div class="item-sub">MongoDB Atlas, Mongoose Models, Resilient Dual In-Memory Store</div>
+            </div>
+            <div class="item">
+              <div class="item-head">⚡ Security & Auth</div>
+              <div class="item-sub">JWT Bearer Tokens, Bcryptjs Hashing, Zod Schema Validation, Strict RBAC</div>
+            </div>
+            <div class="item">
+              <div class="item-head">⚡ Cloud DevOps</div>
+              <div class="item-sub">Vercel (Edge CDN Frontend), Render (Cloud Node Service), Git Monorepo</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div class="card" style="padding: 1rem 1.1rem;">
+            <div style="font-size: 0.88rem; font-weight: 800; color: #fff;">Praween Singh Rawat</div>
+            <div style="font-size: 0.68rem; font-weight: 800; color: var(--ochre); margin-bottom: 0.35rem;">FRONTEND LEAD</div>
+            <div class="item-sub" style="padding-left: 0; line-height: 1.45;">
+              • Designed UI/UX design tokens tailored for mandi trade.<br>
+              • Built interactive Retailer & Wholesaler Dashboards.<br>
+              • Engineered comprehensive multi-section Profile pages.
+            </div>
+          </div>
+
+          <div class="card" style="padding: 1rem 1.1rem;">
+            <div style="font-size: 0.88rem; font-weight: 800; color: #fff;">Anvitha S</div>
+            <div style="font-size: 0.68rem; font-weight: 800; color: var(--ochre); margin-bottom: 0.35rem;">FRONTEND DEVELOPER</div>
+            <div class="item-sub" style="padding-left: 0; line-height: 1.45;">
+              • Multi-role authentication & dynamic session redirection.<br>
+              • 3-stage onboarding wizard (GSTIN, Address, Preferences).<br>
+              • Centralized API service (`api.js`) & Source Cart state.
+            </div>
+          </div>
+
+          <div class="card" style="padding: 1rem 1.1rem;">
+            <div style="font-size: 0.88rem; font-weight: 800; color: #fff;">Tanishq Mittal</div>
+            <div style="font-size: 0.68rem; font-weight: 800; color: var(--blue); margin-bottom: 0.35rem;">BACKEND LEAD</div>
+            <div class="item-sub" style="padding-left: 0; line-height: 1.45;">
+              • Express RESTful routing architecture & endpoints.<br>
+              • Role-Based Access Control (RBAC) & auth middleware.<br>
+              • Database Schemas for User, Product, and Order models.
+            </div>
+          </div>
+
+          <div class="card" style="padding: 1rem 1.1rem;">
+            <div style="font-size: 0.88rem; font-weight: 800; color: #fff;">Ashraj Singh Rana</div>
+            <div style="font-size: 0.68rem; font-weight: 800; color: var(--green); margin-bottom: 0.35rem;">BACKEND & DEVOPS</div>
+            <div class="item-sub" style="padding-left: 0; line-height: 1.45;">
+              • Dynamic aggregation engines (Spend, Revenue, APMC discount %).<br>
+              • Live inline base-price mutation APIs & stock alert triggers.<br>
+              • Cloud deployment setup on Render & automated test suites.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SLIDE 3: System Architecture & Core Workflows ── -->
+    <div class="slide" id="slide-3">
+      <div class="slide-tag">STOCKLINK CAPSTONE PRESENTATION</div>
+      <div class="slide-title">System Architecture & Core Platform Workflows</div>
+
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-title ochre">Retailer Workflow (Buyer)</div>
+          <div class="item-group">
+            <div class="item">
+              <div class="item-head">✔ Hyper-Local Discovery</div>
+              <div class="item-sub">Filter commodities by distance (&lt;5km, 10km, 15km+) from verified mandi mills.</div>
+            </div>
+            <div class="item">
+              <div class="item-head">✔ APMC Price Spotlight</div>
+              <div class="item-sub">Real-time savings benchmarked directly against official APMC Mandi rates (-12.8% savings).</div>
+            </div>
+            <div class="item">
+              <div class="item-head">✔ Source Cart & Tracking</div>
+              <div class="item-sub">Bulk purchase with minimum order quantities and track status (Pending, Dispatched, Delivered).</div>
+            </div>
+            <div class="item">
+              <div class="item-head">✔ Store Profile Manager</div>
+              <div class="item-sub">Control delivery radius, accepted payment modes (COD, NEFT, Card), and store licenses.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title blue">Security & Backend Engine</div>
+          <div class="item-group">
+            <div class="item">
+              <div class="item-head">⚡ Stateless JWT Auth</div>
+              <div class="item-sub">Secure bearer token generation with 7-day expiration and tamper-proof user claims.</div>
+            </div>
+            <div class="item">
+              <div class="item-head">⚡ Dual-Mode Persistence</div>
+              <div class="item-sub">Seamless fallback between live MongoDB Atlas and resilient in-memory stores (100% uptime).</div>
+            </div>
+            <div class="item">
+              <div class="item-head">⚡ Strict Role Barrier</div>
+              <div class="item-sub">Prevents retailers from listing stock and wholesalers from placing orders.</div>
+            </div>
+            <div class="item">
+              <div class="item-head">⚡ Live Aggregation Engine</div>
+              <div class="item-sub">Calculates live metrics from actual database order records rather than static hardcoding.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title green">Wholesaler Workflow (Seller)</div>
+          <div class="item-group">
+            <div class="item">
+              <div class="item-head">✔ Live Revenue & KPIs</div>
+              <div class="item-sub">Calculates month revenue from eligible orders (₹12.4L) and active connected retailers.</div>
+            </div>
+            <div class="item">
+              <div class="item-head">✔ Inline Price Mutation</div>
+              <div class="item-sub">Directly edit SKU base prices on inventory cards with immediate backend persistence.</div>
+            </div>
+            <div class="item">
+              <div class="item-head">✔ Stock Depletion Alerts</div>
+              <div class="item-sub">Automatic triggers identifying low-stock inventory (threshold &le; 10 units).</div>
+            </div>
+            <div class="item">
+              <div class="item-head">✔ Order Fulfilment Queue</div>
+              <div class="item-sub">Prioritized fulfillment table displaying buyer identity, quantity, and settlement values.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SLIDE 4: Advantages, Disadvantages & Roadmap ── -->
+    <div class="slide" id="slide-4">
+      <div class="slide-tag">STOCKLINK CAPSTONE PRESENTATION</div>
+      <div class="slide-title">Project Analysis: Advantages, Limitations & Roadmap</div>
+
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-title green">Key Advantages</div>
+          <div class="item-group">
+            <div class="item">
+              <div class="item-head">★ Direct Disintermediation</div>
+              <div class="item-sub">Eliminates 12–18% middleman commission markups between mills and shops.</div>
+            </div>
+            <div class="item">
+              <div class="item-head">★ Zero Ghost Inventory</div>
+              <div class="item-sub">Real-time stock reservation prevents cancelled orders and stockouts.</div>
+            </div>
+            <div class="item">
+              <div class="item-head">★ Transparent Price Discovery</div>
+              <div class="item-sub">Live APMC benchmark comparison provides fair pricing visibility.</div>
+            </div>
+            <div class="item">
+              <div class="item-head">★ Resilient Dual Engine</div>
+              <div class="item-sub">In-memory fallback guarantees 100% platform uptime during database downtime.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title ochre">Current Limitations</div>
+          <div class="item-group">
+            <div class="item">
+              <div class="item-head">▲ Active Internet Dependency</div>
+              <div class="item-sub">Live inventory counts and rate updates require continuous connectivity.</div>
+            </div>
+            <div class="item">
+              <div class="item-head">▲ Local Geofence Boundaries</div>
+              <div class="item-sub">Logistics radius currently optimized for localized mandi hubs (&lt;15–20 km).</div>
+            </div>
+            <div class="item">
+              <div class="item-head">▲ Single Currency Ecosystem</div>
+              <div class="item-sub">Transactions are optimized exclusively for Indian Rupees (INR) and GSTIN formats.</div>
+            </div>
+            <div class="item">
+              <div class="item-head">▲ Manual High-Value Settlement</div>
+              <div class="item-sub">High-value bank transfers currently require manual invoice reconciliation.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title blue">Future Enhancements</div>
+          <div class="item-group">
+            <div class="item">
+              <div class="item-head">🚀 AI Predictive Procurement</div>
+              <div class="item-sub">ML forecasting of mandi price trends and automated Kirana stock replenishment.</div>
+            </div>
+            <div class="item">
+              <div class="item-head">🚀 Automated e-Way Bills</div>
+              <div class="item-sub">Instant GST e-Way bill and tax invoice generation upon order dispatch.</div>
+            </div>
+            <div class="item">
+              <div class="item-head">🚀 Integrated Escrow Gateway</div>
+              <div class="item-sub">Milestone-based digital payment holding until delivery confirmation by retailer.</div>
+            </div>
+            <div class="item">
+              <div class="item-head">🚀 Vernacular Voice Search</div>
+              <div class="item-sub">Multilingual voice search (Hindi, Kannada, Telugu, Marathi) for local traders.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SLIDE 5: Hosting & Learning Experiences ── -->
+    <div class="slide" id="slide-5">
+      <div class="slide-tag">STOCKLINK CAPSTONE PRESENTATION</div>
+      <div class="slide-title">Project Hosting Links & Key Learning Experiences</div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title green">Live Cloud Deployment & Repo</div>
+          <div class="item-group">
+            <div class="item">
+              <div class="item-head">🔗 Live Web Application (Frontend)</div>
+              <div style="font-size: 0.8rem; font-weight: 700; color: var(--ochre); padding-left: 1rem;">https://fft-capstone-project.vercel.app</div>
+              <div class="item-sub">Deployed globally on Vercel Edge Network with client SPA rewrite protections.</div>
+            </div>
+            <div class="item">
+              <div class="item-head">🔗 Backend REST API Service</div>
+              <div style="font-size: 0.8rem; font-weight: 700; color: var(--ochre); padding-left: 1rem;">https://fft-capstone-project.onrender.com/api/health</div>
+              <div class="item-sub">Live Node.js Express server running on Render with active health monitoring.</div>
+            </div>
+            <div class="item">
+              <div class="item-head">🔗 GitHub Monorepo Repository</div>
+              <div style="font-size: 0.8rem; font-weight: 700; color: var(--ochre); padding-left: 1rem;">https://github.com/PraweenRawat/FFT_CAPSTONE_PROJECT</div>
+              <div class="item-sub">Complete source code, git version history, models, routes & test suites.</div>
+            </div>
+            <div class="item">
+              <div class="item-head">🔑 Demo Login Credentials</div>
+              <div class="item-sub">Retailer: retailer@stocklink.in / retailer123<br>Wholesaler: wholesaler@stocklink.in / wholesaler123</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title ochre">Key Learning Experiences in This Subject</div>
+          <div class="item-group">
+            <div class="item">
+              <div class="item-head">💡 Full-Stack Systems Architecture</div>
+              <div class="item-sub">Mastered connecting decoupled React Vite frontends with Express microservices using dynamic environment variables and CORS policies.</div>
+            </div>
+            <div class="item">
+              <div class="item-head">💡 Enterprise-Grade Security (RBAC)</div>
+              <div class="item-sub">Implemented stateless JSON Web Tokens, bcrypt password hashing, and server-side authorization guards preventing identity spoofing.</div>
+            </div>
+            <div class="item">
+              <div class="item-head">💡 Data Persistence & Graceful Degradation</div>
+              <div class="item-sub">Engineered resilient multi-tier data persistence that seamlessly balances live MongoDB Atlas connections with in-memory stores.</div>
+            </div>
+            <div class="item">
+              <div class="item-head">💡 Production Cloud DevOps</div>
+              <div class="item-sub">Acquired hands-on mastery of production CI/CD pipelines, edge rewrites, zero-downtime cloud deployments, and automated testing.</div>
+            </div>
+            <div class="item">
+              <div class="item-head">💡 Agile Teamwork & Collaboration</div>
+              <div class="item-sub">Coordinated 4-member pair programming, Git monorepo branching, and clear interface contracts across Frontend and Backend teams.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── Bottom Navigation Bar ── -->
+  <div class="controls">
+    <div class="badge" id="slide-num">Slide 1 of 5</div>
+    <div class="btn-group">
+      <button class="btn" onclick="prevSlide()">◀ Previous</button>
+      <button class="btn" onclick="nextSlide()">Next ▶</button>
+      <button class="btn" onclick="window.print()">🖨️ Save as PDF</button>
+    </div>
+  </div>
+
+  <script>
+    let current = 1;
+    const total = 5;
+
+    function showSlide(n) {
+      document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+      const active = document.getElementById(`slide-${n}`);
+      if (active) active.classList.add('active');
+      document.getElementById('slide-num').innerText = `Slide ${n} of ${total}`;
+    }
+
+    function nextSlide() {
+      if (current < total) { current++; showSlide(current); }
+    }
+    function prevSlide() {
+      if (current > 1) { current--; showSlide(current); }
+    }
+
+    // Keyboard Arrow navigation
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === 'Space') nextSlide();
+      if (e.key === 'ArrowLeft') prevSlide();
+    });
+  </script>
+</body>
+</html>
